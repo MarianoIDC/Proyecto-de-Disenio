@@ -1,0 +1,28 @@
+GRAVITY = 0
+MASS = 0
+
+PLANE_COLOR = [1, 1, 1, 1] 
+#REFERENCE_COLOR = [4, 1, 1, 1]
+WALL_COLOR = [0, 1, 1, 1]
+
+PLANE_DIMENSIONS = dimensions = [22.5, 22.5, 0.1]
+PLANE_POSITION = [0, 0, 0]
+
+PLANE_ORIENTATION = [0, 0, 0, 1]
+#ORIGIN_ORIENTATION = [0, 0, 0, 1]
+VERTICAL_ORIENTATION = [0, 1, 0, 1]
+HORIZONTAL_ORIENTATION = [0, 0, 1, 1]
+
+DRONE_URDF = "RandomTestEnvironment/drone.urdf"
+DRONE_ORIENTATION = [0, 0, 0, 1]
+
+
+
+
+
+
+
+
+
+
+
