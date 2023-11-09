@@ -11,7 +11,7 @@ from PSO import Particle
 
 
 
-def run_pso(num_particles, iterations, size):
+def run_pso(iterations, size, num_particles):
     """
     Esta funcion corre el programa
     """
@@ -57,15 +57,16 @@ def run_pso(num_particles, iterations, size):
 
     # BLUEPRINT = generate_blueprint(points_number=POINTS, size = size)
     BLUEPRINT = generate_blueprint(density=0.2, size = size)
-    def save_log(pos_best_g, err_best_g, iteration, explore, swarm):
+    def save_log(pos_best_g, err_best_g, iteration, explore, swarm, elapsed_seconds):
+        current_time = datetime.datetime.now()
         data = [
-            ['Dron#', 'Best Postion Global', 'Best Error Global', 'Iterations', 'Iteration','Size','Total Percentage Explore', 'Individual Error', 'Individual Position']
+            ['Dron#', 'Best Postion Global', 'Best Error Global', 'Iterations', 'Iteration','Size','Total Percentage Explore', 'Individual Error', 'Individual Position', 'Elapsed Time(s)']
         ]
         count = 1
         for particle in swarm:
-            data.append([count, pos_best_g, err_best_g, iterations, iteration, size, explore, particle.error, particle.pos])
+            data.append([count, pos_best_g, err_best_g, iterations, iteration, size, explore, particle.error, particle.pos, elapsed_seconds])
             count +=1
-        csv_file = './Data_log.csv'
+        csv_file = './results/Data_log_{}-{}-{}_{}-{}-{}.csv'.format(current_time.day,current_time.month,current_time.year,current_time.hour,current_time.minute,current_time.second)
         # Abre el archivo CSV en modo escritura
         with open(csv_file, 'w', newline='',encoding='utf-8') as file:   
             writer = csv.writer(file)
@@ -86,7 +87,7 @@ def run_pso(num_particles, iterations, size):
                 if map[i][j]==1:
                     count +=1            
         percentage = round((count/(map_size**2))*100)
-        print("Percentaje of the map cover: {}".format(percentage))
+        # print("Percentaje of the map cover: {}".format(percentage))
         return percentage
     PERCENTAGE_MAP = empty_blueprint(size=size)
     EMPTY_MAP = empty_blueprint(size=size)
@@ -114,11 +115,11 @@ def run_pso(num_particles, iterations, size):
 
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                print ('FINAL:')
-                print ('Best position Grupal: {}'.format(pos_best_g))
-                print ('Best error Grupal: {}'.format(err_best_g))
-                print ('Iterations: {}'.format(iteration))
-                print ('Percetage Explore: {}'.format(explore))
+                # print ('FINAL:')
+                # print ('Best position Grupal: {}'.format(pos_best_g))
+                # print ('Best error Grupal: {}'.format(err_best_g))
+                # print ('Iterations: {}'.format(iteration))
+                # print ('Percetage Explore: {}'.format(explore))
                 pygame.quit()
                 sys.exit()
                 
@@ -180,6 +181,6 @@ def run_pso(num_particles, iterations, size):
     print ('Best error Grupal: {}'.format(err_best_g))
     print ('Iterations: {}'.format(iteration))
     print ('Percetage Explore: {}'.format(explore))
-    save_log(pos_best_g, err_best_g, iteration, explore, swarm)
+    save_log(pos_best_g, err_best_g, iteration, explore, swarm, elapsed_seconds)
 
-run_pso(num_particles=10, iterations=100, size = 50)
+# run_pso(num_particles=10, iterations=100, size = 50)
