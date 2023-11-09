@@ -61,12 +61,12 @@ def run_pso(iterations, size, num_particles):
     def save_log(pos_best_g, err_best_g, iteration, explore, swarm, elapsed_seconds):
         current_time = datetime.datetime.now()
         data = [
-            ['Dron#', 'Best Postion Global', 'Best Error Global', 'Iterations', 'Iteration', 'Size',
+            ['Dron#','Dron Amount', 'Best Postion Global', 'Best Error Global', 'Iterations', 'Iteration', 'Size',
                 'Total Percentage Explore', 'Individual Error', 'Individual Position', 'Elapsed Time(s)']
         ]
         count = 1
         for particle in swarm:
-            data.append([count, pos_best_g, err_best_g, iterations, iteration,
+            data.append([count, num_particles,pos_best_g, err_best_g, iterations, iteration,
                         size, explore, particle.error, particle.pos, elapsed_seconds])
             count += 1
         csv_file = './results/Data_log_{}-{}-{}_{}-{}-{}.csv'.format(
