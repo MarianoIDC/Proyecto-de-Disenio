@@ -201,4 +201,4 @@ def run_pso(iterations, size, num_particles):
             running = False
 
 
-run_pso(num_particles=10, iterations=100, size=50)
+# run_pso(num_particles=10, iterations=100, size=50)
