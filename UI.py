@@ -103,15 +103,60 @@ def run_pso(iterations, size, num_particles):
 
 
     font = pygame.font.Font(None, 36)  # Choose a font and font size
-    text = "Iterations"
     text_color = (255, 255, 255)  # White
 
     start_time = pygame.time.get_ticks()
-    while running:
+    # while running:
+    while True:
+        if running:
+            explore = percetange_explore(PERCENTAGE_MAP)
+            current_time = pygame.time.get_ticks()  # Tiempo actual en milisegundos
+            elapsed_seconds = (current_time - start_time) // 1000  # Convertir a segundos                
+            
+            MAIN_WINDOW.fill(MAIN_WINDOW_BACKGROUND_COLOR)
 
-        explore = percetange_explore(PERCENTAGE_MAP)
-        current_time = pygame.time.get_ticks()  # Tiempo actual en milisegundos
-        elapsed_seconds = (current_time - start_time) // 1000  # Convertir a segundos
+            timer_surface = font.render("Elapsed Time: {} s".format(elapsed_seconds), True, text_color)
+            MAIN_WINDOW.blit(timer_surface, (10, 10))
+
+            iteration_surface = font.render("Iterations: {} of {}".format(iteration, iterations), True, text_color)
+            MAIN_WINDOW.blit(iteration_surface, (10, 50))  # Position the text surface
+            
+            percentage_surface = font.render("Percentage: {}%".format(explore), True, text_color)
+            MAIN_WINDOW.blit(percentage_surface, (10, 100))  # Position the text surface
+            
+            dron_surface = font.render("Drones: {} units".format(num_particles), True, text_color)
+            MAIN_WINDOW.blit(dron_surface, (10, 150))  # Position the text surface
+
+            size_surface = font.render("Size: {}x{}".format(size,size), True, text_color)
+            MAIN_WINDOW.blit(size_surface, (10, 200))  # Position the text surface
+
+            MAIN_WINDOW.blit(TERRAIN, (350, 10))
+            
+
+            # draw the target
+            pygame.draw.rect(TERRAIN, TARGET_COLOR, (
+                TARGET_POSITION[0] * PIXEL_WIDHT, TARGET_POSITION[1] * PIXEL_HEIGHT, PIXEL_WIDHT, PIXEL_HEIGHT))
+
+            for particle in swarm:
+                x_particle = particle.pos[0]
+                y_particle = particle.pos[1]
+
+                PERCENTAGE_MAP[x_particle][y_particle] = 1
+
+                pygame.draw.rect(TERRAIN, particle.color, (
+                    x_particle * PIXEL_WIDHT, y_particle * PIXEL_HEIGHT, PIXEL_WIDHT, PIXEL_HEIGHT))
+                particle.evaluate_fitness()
+                particle.update_velocity(pos_best_g)
+                EMPTY_MAP = particle.update_position(size, BLUEPRINT, EMPTY_MAP)
+                draw_blueprint(EMPTY_MAP)
+                if explore>=80:
+                    running = False
+                if particle.error < err_best_g or err_best_g == -1:
+                    pos_best_g = list(particle.pos)
+                    err_best_g = float(particle.error)
+                if particle.pos[0]==TARGET_POSITION[0] and particle.pos[1]==TARGET_POSITION[1]:
+                    running = False
+            iteration += 1
 
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
@@ -120,67 +165,22 @@ def run_pso(iterations, size, num_particles):
                 # print ('Best error Grupal: {}'.format(err_best_g))
                 # print ('Iterations: {}'.format(iteration))
                 # print ('Percetage Explore: {}'.format(explore))
+                save_log(pos_best_g, err_best_g, iteration, explore, swarm, elapsed_seconds)
                 pygame.quit()
                 sys.exit()
                 
-        
-        MAIN_WINDOW.fill(MAIN_WINDOW_BACKGROUND_COLOR)
-
-        timer_surface = font.render("Elapsed Time: {} s".format(elapsed_seconds), True, text_color)
-        MAIN_WINDOW.blit(timer_surface, (10, 10))
-
-        iteration_surface = font.render("Iterations: {} of {}".format(iteration, iterations), True, text_color)
-        MAIN_WINDOW.blit(iteration_surface, (10, 50))  # Position the text surface
-        
-        percentage_surface = font.render("Percentage: {}%".format(explore), True, text_color)
-        MAIN_WINDOW.blit(percentage_surface, (10, 100))  # Position the text surface
-        
-        dron_surface = font.render("Drones: {} units".format(num_particles), True, text_color)
-        MAIN_WINDOW.blit(dron_surface, (10, 150))  # Position the text surface
-
-        size_surface = font.render("Size: {}x{}".format(size,size), True, text_color)
-        MAIN_WINDOW.blit(size_surface, (10, 200))  # Position the text surface
-
-        MAIN_WINDOW.blit(TERRAIN, (350, 10))
-        
-
-        # draw the target
-        pygame.draw.rect(TERRAIN, TARGET_COLOR, (
-            TARGET_POSITION[0] * PIXEL_WIDHT, TARGET_POSITION[1] * PIXEL_HEIGHT, PIXEL_WIDHT, PIXEL_HEIGHT))
-
-        for particle in swarm:
-            x_particle = particle.pos[0]
-            y_particle = particle.pos[1]
-
-            PERCENTAGE_MAP[x_particle][y_particle] = 1
-
-            pygame.draw.rect(TERRAIN, particle.color, (
-                x_particle * PIXEL_WIDHT, y_particle * PIXEL_HEIGHT, PIXEL_WIDHT, PIXEL_HEIGHT))
-            particle.evaluate_fitness()
-            particle.update_velocity(pos_best_g)
-            EMPTY_MAP = particle.update_position(size, BLUEPRINT, EMPTY_MAP)
-            draw_blueprint(EMPTY_MAP)
-            if explore>=80:
-                running = False
-            if particle.error < err_best_g or err_best_g == -1:
-                pos_best_g = list(particle.pos)
-                err_best_g = float(particle.error)
-            if particle.pos[0]==TARGET_POSITION[0] and particle.pos[1]==TARGET_POSITION[1]:
-                running = False
-
-
         # Refresca la pantalla
         pygame.display.flip()
         # print("Iretarion: {}".format(iteration))
-        iteration += 1
+        
         time.sleep(0.05)
-        if iteration >= iterations:
+        if iteration > iterations:
             running = False
-    print ('FINAL:')
-    print ('Best position Grupal: {}'.format(pos_best_g))
-    print ('Best error Grupal: {}'.format(err_best_g))
-    print ('Iterations: {}'.format(iteration))
-    print ('Percetage Explore: {}'.format(explore))
-    save_log(pos_best_g, err_best_g, iteration, explore, swarm, elapsed_seconds)
+    # print ('FINAL:')
+    # print ('Best position Grupal: {}'.format(pos_best_g))
+    # print ('Best error Grupal: {}'.format(err_best_g))
+    # print ('Iterations: {}'.format(iteration))
+    # print ('Percetage Explore: {}'.format(explore))
+    # save_log(pos_best_g, err_best_g, iteration, explore, swarm, elapsed_seconds)
 
 # run_pso(num_particles=10, iterations=100, size = 50)
