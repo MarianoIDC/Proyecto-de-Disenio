@@ -10,7 +10,6 @@ from maze import generate_blueprint, empty_blueprint
 from PSO import Particle
 
 
-
 def run_pso(iterations, size, num_particles):
     """
     Esta funcion corre el programa
@@ -36,8 +35,9 @@ def run_pso(iterations, size, num_particles):
     MAIN_WINDOW_BACKGROUND_COLOR = (27, 50, 95)
     TERRAIN_BACKGROUND_COLOR = (156, 196, 228)
     BLACK = (0, 0, 0)
+    WHITE = (255, 255, 255)
     TARGET_COLOR = (127, 255, 0)
-    RED = (255,0,0)
+    RED = (255, 0, 0)
     DRON = (255, 228, 196)
 
     pygame.init()
@@ -56,21 +56,26 @@ def run_pso(iterations, size, num_particles):
     # MAIN_WINDOW.blit(TERRAIN, (10, 10))
 
     # BLUEPRINT = generate_blueprint(points_number=POINTS, size = size)
-    BLUEPRINT = generate_blueprint(density=0.2, size = size)
+    BLUEPRINT = generate_blueprint(density=0.2, size=size)
+
     def save_log(pos_best_g, err_best_g, iteration, explore, swarm, elapsed_seconds):
         current_time = datetime.datetime.now()
         data = [
-            ['Dron#', 'Best Postion Global', 'Best Error Global', 'Iterations', 'Iteration','Size','Total Percentage Explore', 'Individual Error', 'Individual Position', 'Elapsed Time(s)']
+            ['Dron#', 'Best Postion Global', 'Best Error Global', 'Iterations', 'Iteration', 'Size',
+                'Total Percentage Explore', 'Individual Error', 'Individual Position', 'Elapsed Time(s)']
         ]
         count = 1
         for particle in swarm:
-            data.append([count, pos_best_g, err_best_g, iterations, iteration, size, explore, particle.error, particle.pos, elapsed_seconds])
-            count +=1
-        csv_file = './results/Data_log_{}-{}-{}_{}-{}-{}.csv'.format(current_time.day,current_time.month,current_time.year,current_time.hour,current_time.minute,current_time.second)
+            data.append([count, pos_best_g, err_best_g, iterations, iteration,
+                        size, explore, particle.error, particle.pos, elapsed_seconds])
+            count += 1
+        csv_file = './results/Data_log_{}-{}-{}_{}-{}-{}.csv'.format(
+            current_time.day, current_time.month, current_time.year, current_time.hour, current_time.minute, current_time.second)
         # Abre el archivo CSV en modo escritura
-        with open(csv_file, 'w', newline='',encoding='utf-8') as file:   
+        with open(csv_file, 'w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
             writer.writerows(data)
+
     def draw_blueprint(blueprint):
         """Function drwas the blueprint in the surface"""
         for fila in range(len(blueprint)):
@@ -84,8 +89,8 @@ def run_pso(iterations, size, num_particles):
         map_size = len(map[0])
         for i in range(map_size):
             for j in range(map_size):
-                if map[i][j]==1:
-                    count +=1            
+                if map[i][j] == 1:
+                    count += 1
         percentage = round((count/(map_size**2))*100)
         # print("Percentaje of the map cover: {}".format(percentage))
         return percentage
@@ -101,37 +106,51 @@ def run_pso(iterations, size, num_particles):
     running = True
     iteration = 0
 
-
     font = pygame.font.Font(None, 36)  # Choose a font and font size
     text_color = (255, 255, 255)  # White
 
     start_time = pygame.time.get_ticks()
     # while running:
+
+    def draw_button(x, y, text):
+        button_text = font.render(text, True, BLACK)
+        button_rect = button_text.get_rect(center=(x, y))
+        pygame.draw.rect(MAIN_WINDOW, WHITE, button_rect, border_radius=5)
+        MAIN_WINDOW.blit(button_text, button_rect)
     while True:
         if running:
             explore = percetange_explore(PERCENTAGE_MAP)
             current_time = pygame.time.get_ticks()  # Tiempo actual en milisegundos
-            elapsed_seconds = (current_time - start_time) // 1000  # Convertir a segundos                
-            
+            # Convertir a segundos
+            elapsed_seconds = (current_time - start_time) // 1000
+
             MAIN_WINDOW.fill(MAIN_WINDOW_BACKGROUND_COLOR)
 
-            timer_surface = font.render("Elapsed Time: {} s".format(elapsed_seconds), True, text_color)
+            timer_surface = font.render("Elapsed Time: {} s".format(
+                elapsed_seconds), True, text_color)
             MAIN_WINDOW.blit(timer_surface, (10, 10))
 
-            iteration_surface = font.render("Iterations: {} of {}".format(iteration, iterations), True, text_color)
-            MAIN_WINDOW.blit(iteration_surface, (10, 50))  # Position the text surface
-            
-            percentage_surface = font.render("Percentage: {}%".format(explore), True, text_color)
-            MAIN_WINDOW.blit(percentage_surface, (10, 100))  # Position the text surface
-            
-            dron_surface = font.render("Drones: {} units".format(num_particles), True, text_color)
-            MAIN_WINDOW.blit(dron_surface, (10, 150))  # Position the text surface
+            iteration_surface = font.render("Iterations: {} of {}".format(
+                iteration, iterations), True, text_color)
+            # Position the text surface
+            MAIN_WINDOW.blit(iteration_surface, (10, 50))
 
-            size_surface = font.render("Size: {}x{}".format(size,size), True, text_color)
-            MAIN_WINDOW.blit(size_surface, (10, 200))  # Position the text surface
+            percentage_surface = font.render(
+                "Percentage: {}%".format(explore), True, text_color)
+            # Position the text surface
+            MAIN_WINDOW.blit(percentage_surface, (10, 100))
+
+            dron_surface = font.render(
+                "Drones: {} units".format(num_particles), True, text_color)
+            # Position the text surface
+            MAIN_WINDOW.blit(dron_surface, (10, 150))
+
+            size_surface = font.render(
+                "Size: {}x{}".format(size, size), True, text_color)
+            # Position the text surface
+            MAIN_WINDOW.blit(size_surface, (10, 200))
 
             MAIN_WINDOW.blit(TERRAIN, (350, 10))
-            
 
             # draw the target
             pygame.draw.rect(TERRAIN, TARGET_COLOR, (
@@ -147,40 +166,39 @@ def run_pso(iterations, size, num_particles):
                     x_particle * PIXEL_WIDHT, y_particle * PIXEL_HEIGHT, PIXEL_WIDHT, PIXEL_HEIGHT))
                 particle.evaluate_fitness()
                 particle.update_velocity(pos_best_g)
-                EMPTY_MAP = particle.update_position(size, BLUEPRINT, EMPTY_MAP)
+                EMPTY_MAP = particle.update_position(
+                    size, BLUEPRINT, EMPTY_MAP)
                 draw_blueprint(EMPTY_MAP)
-                if explore>=80:
+                if explore >= 80:
                     running = False
                 if particle.error < err_best_g or err_best_g == -1:
                     pos_best_g = list(particle.pos)
                     err_best_g = float(particle.error)
-                if particle.pos[0]==TARGET_POSITION[0] and particle.pos[1]==TARGET_POSITION[1]:
+                if particle.pos[0] == TARGET_POSITION[0] and particle.pos[1] == TARGET_POSITION[1]:
                     running = False
             iteration += 1
-
+        else:
+            draw_button(100, 250, "Save Log")
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                # print ('FINAL:')
-                # print ('Best position Grupal: {}'.format(pos_best_g))
-                # print ('Best error Grupal: {}'.format(err_best_g))
-                # print ('Iterations: {}'.format(iteration))
-                # print ('Percetage Explore: {}'.format(explore))
-                save_log(pos_best_g, err_best_g, iteration, explore, swarm, elapsed_seconds)
+                # save_log(pos_best_g, err_best_g, iteration, explore, swarm, elapsed_seconds)
                 pygame.quit()
                 sys.exit()
-                
+            elif evento.type == pygame.MOUSEBUTTONDOWN:
+                # Check if the mouse click is within the button area
+                button_rect = font.render(
+                    "Save Loog", True, BLACK).get_rect(center=(100, 250))
+                if button_rect.collidepoint(evento.pos):
+                    save_log(pos_best_g, err_best_g, iteration,
+                             explore, swarm, elapsed_seconds)
+                    # print("Data saved!")
+
         # Refresca la pantalla
         pygame.display.flip()
-        # print("Iretarion: {}".format(iteration))
-        
+
         time.sleep(0.05)
         if iteration > iterations:
             running = False
-    # print ('FINAL:')
-    # print ('Best position Grupal: {}'.format(pos_best_g))
-    # print ('Best error Grupal: {}'.format(err_best_g))
-    # print ('Iterations: {}'.format(iteration))
-    # print ('Percetage Explore: {}'.format(explore))
-    # save_log(pos_best_g, err_best_g, iteration, explore, swarm, elapsed_seconds)
 
-# run_pso(num_particles=10, iterations=100, size = 50)
+
+run_pso(num_particles=10, iterations=100, size=50)
