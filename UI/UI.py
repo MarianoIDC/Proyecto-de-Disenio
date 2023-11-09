@@ -3,70 +3,103 @@ import pygame
 import sys
 import math
 import random
+from maze import generate_blueprint
+from pso_natan import Particle
 
-# Initialize Pygame
-pygame.init()
 
-# Constants
-WIDTH, HEIGHT = 800, 400
-BACKGROUND_COLOR = (255, 255, 255)
-PARTICLE_COLOR = (0, 0, 255)
-TARGET_COLOR = (255, 0, 0)
-PARTICLE_RADIUS = 5
-TARGET_RADIUS = 8
-PARTICLE_COUNT = 20
-MAX_VELOCITY = 5
-TARGET_X = 400
-TARGET_Y = 200
-OPTIMAL_VALUE = 0  # Change this to the function minimum you want to find
+def run_pso(num_particles, iterations, size):
+    """
+    Esta funcion corre el programa
+    """
+    # VARIABLES
+    POINTS = 500
+    BOUNDS = [(0, size), (0, size)]
+    TARGET_POSITION = [size-1, size-1]
+    err_best_g = -1                   # best error for group
+    pos_best_g = []                   # best position for group
 
-# Initialize the Pygame window
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("PSO Visualization")
+    # DEFINE SIZES
+    MAIN_WIDTH = 800
+    MAIN_HEIGHT = 600
 
-# Particle class
-class Particle:
-    def __init__(self):
-        self.x = random.uniform(0, WIDTH)
-        self.y = random.uniform(0, HEIGHT)
-        self.velocity_x = random.uniform(-MAX_VELOCITY, MAX_VELOCITY)
-        self.velocity_y = random.uniform(-MAX_VELOCITY, MAX_VELOCITY)
-        self.best_x = self.x
-        self.best_y = self.y
+    TERRAIN_WIDTH = 500
+    TERRAIN_HEIGHT = 500
 
-    def move(self):
-        self.x += self.velocity_x
-        self.y += self.velocity_y
-        # Update best position
-        if self.fitness() < self.fitness(self.best_x, self.best_y):
-            self.best_x = self.x
-            self.best_y = self.y
+    PIXEL_WIDHT = 5
+    PIXEL_HEIGHT = 5
 
-    def fitness(self, x=None, y=None):
-        if x is None or y is None:
-            x = self.x
-            y = self.y
-        return (x - TARGET_X) ** 2 + (y - TARGET_Y) ** 2  # Change this function
+    # DEFINE COLORS
+    MAIN_WINDOW_BACKGROUND_COLOR = (27, 50, 95)
+    TERRAIN_BACKGROUND_COLOR = (156, 196, 228)
+    BLACK = (0, 0, 0)
+    TARGET_COLOR = (127, 255, 0)
 
-particles = [Particle() for _ in range(PARTICLE_COUNT)]
+    pygame.init()
+    # DEFINE THE MAIN WINDOW TITLE
+    WINDOW_TITLE = "PARTICLE SWARM OPTIMIZATION - 2D"
+    pygame.display.set_caption(WINDOW_TITLE)
 
-screen.fill(BACKGROUND_COLOR)
-# Main loop
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+    # CREATE THE MAIN WINDOW
+    MAIN_WINDOW = pygame.display.set_mode((MAIN_WIDTH, MAIN_HEIGHT))
+    # Llena el canvas con el color de fondo
+    MAIN_WINDOW.fill(MAIN_WINDOW_BACKGROUND_COLOR)
 
-    
-    time.sleep(0.05)
-    for particle in particles:
-        particle.move()
-        pygame.draw.circle(screen, PARTICLE_COLOR, (int(particle.x), int(particle.y)), PARTICLE_RADIUS)
-        pygame.draw.circle(screen, TARGET_COLOR, (TARGET_X, TARGET_Y), TARGET_RADIUS)
+    # CREATE THE SURFACE TO DRAW THE ALGORITHM
+    TERRAIN = pygame.Surface((TERRAIN_WIDTH, TERRAIN_WIDTH))
+    TERRAIN.fill(TERRAIN_BACKGROUND_COLOR)
+    # MAIN_WINDOW.blit(TERRAIN, (10, 10))
 
-    pygame.display.flip()
+    BLUEPRINT = generate_blueprint(points_number=POINTS, size = size)
 
-# Quit Pygame
-pygame.quit()
-sys.exit()
+    def draw_blueprint():
+        """Function drwas the blueprint in the surface"""
+        for fila in range(len(BLUEPRINT)):
+            for col in range(len(BLUEPRINT[0])):
+                if BLUEPRINT[fila][col] == 1:
+                    pygame.draw.rect(
+                        TERRAIN, BLACK, (col * PIXEL_WIDHT, fila * PIXEL_HEIGHT, PIXEL_WIDHT, PIXEL_HEIGHT))
+
+    swarm = []
+    for p in range(0, num_particles):
+        # initial_r = [random.randint(0,100), random.randint(0,100)]
+        initial_r = [1, 1]
+        swarm.append(Particle(initial_r, target=TARGET_POSITION))
+
+    running = True
+    iteration = 0
+    while running:
+        # for evento in pygame.event.get():
+        #     if evento.type == pygame.QUIT:
+        #         pygame.quit()
+        #         sys.exit()
+
+        # Dibuja en el canvas
+
+        MAIN_WINDOW.blit(TERRAIN, (10, 10))
+        draw_blueprint()
+
+        # draw the target
+        pygame.draw.rect(TERRAIN, TARGET_COLOR, (
+            TARGET_POSITION[0] * PIXEL_WIDHT, TARGET_POSITION[1] * PIXEL_HEIGHT, PIXEL_WIDHT*2, PIXEL_HEIGHT*2))
+
+        for particle in swarm:
+            pygame.draw.rect(TERRAIN, particle.color, (
+                particle.position_i[0] * PIXEL_WIDHT, particle.position_i[1] * PIXEL_HEIGHT, PIXEL_WIDHT, PIXEL_HEIGHT))
+            particle.evaluate()
+
+            if particle.err_i < err_best_g or err_best_g == -1:
+                pos_best_g = list(particle.position_i)
+                err_best_g = float(particle.err_i)
+
+            particle.update_velocity(pos_best_g)
+            particle.update_position(BOUNDS)
+
+        # Refresca la pantalla
+        pygame.display.flip()
+        iteration += 1
+        # time.sleep(0.05)
+        # if iteration >= iterations:
+        #     running = False
+
+
+run_pso(num_particles=15, iterations=10000000, size = 100)

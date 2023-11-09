@@ -38,8 +38,8 @@ def print_maze(maze):
         print(' '.join(row))
 
 if __name__ == "__main__":
-    rows = 11
-    cols = 11
+    rows = 1000
+    cols = 1000
     
     maze = generate_maze(rows, cols)
     print_maze(maze)

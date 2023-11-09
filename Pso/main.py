@@ -15,8 +15,8 @@ import _thread
 import matplotlib.pyplot as plt
 import random
 
-initial = [random.randint(-400, 400), random.randint(-400, 400)]
-bounds = [(-400, 400), (-400, 400)]
+initial = [random.randint(-200, 200), random.randint(-200, 200)]
+bounds = [(-200, 200), (-200, 200)]
 
 colors = np.array([
     (31, 119, 180), (174, 199, 232), (255, 127,  14), (255, 187, 120),
@@ -120,7 +120,7 @@ def getXY(filename):
     # 		lat = row[0]
     # 		long= row[1]
     # return lat,long
-    return 250, 360
+    return 100, 60
 
 
 class Interactive_PSO():
@@ -136,13 +136,13 @@ class Interactive_PSO():
         active_flag = 0
         swarm = []
         for i in range(0, num_particles):
-            initial_r = [random.randint(-400, 400), random.randint(-400, 400)]
+            initial_r = [random.randint(-200, 200), random.randint(-200, 200)]
             swarm.append(Particle(initial_r))
         x, y = getXY('target.csv')
         plt.plot(float(x), float(y),  color='k', marker='X')
         i = 0
         # while True:
-        while (i < iterations or (active_flag==1 and round(global_best_error)>100)):
+        while (i <= iterations or (active_flag==1 and round(global_best_error)>100)):
             # print(str(active_flag)+'aaaaa'+str(round(global_best_error)))
             active_flag = 1
             # print('x'+','+'y',file = open('pos.csv','w'))
@@ -184,7 +184,7 @@ class Interactive_PSO():
             i += 1
         for j in range(0, num_particles):
             plt.plot(pos_0[j], pos_1[j],  color=colors[j], marker='o')
-        plt.plot(float(x), float(y),  color='k', marker='X')
+        # plt.plot(float(x), float(y),  color='k', marker='X')
         plt.show()
         print('Results')
         print('Best Position:', global_best_position)
@@ -195,6 +195,6 @@ class Interactive_PSO():
 
 # let say 2 particles and 50 iterations
 # Interactive_PSO(fitness_function, initial, bounds,num_particles=5, iterations=1000)
-Interactive_PSO(initial, bounds,num_particles=5, iterations=1000)
+Interactive_PSO(initial, bounds,num_particles=5, iterations=50)
 # if __name__ == "__Interactive_PSO__":
 #     Interactive_PSO(fitness_function, initial, bounds, num_particles=5, iterations=1000)
