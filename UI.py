@@ -33,7 +33,7 @@ def run_pso(iterations, size, num_particles):
 
     # DEFINE COLORS
     MAIN_WINDOW_BACKGROUND_COLOR = (27, 50, 95)
-    TERRAIN_BACKGROUND_COLOR = (156, 196, 228)
+    TERRAIN_BACKGROUND_COLOR = (255,255,255)
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
     TARGET_COLOR = (127, 255, 0)
@@ -59,6 +59,7 @@ def run_pso(iterations, size, num_particles):
     BLUEPRINT = generate_blueprint(density=0.2, size=size)
 
     def save_log(pos_best_g, err_best_g, iteration, explore, swarm, elapsed_seconds):
+        """Function to save the results"""
         current_time = datetime.datetime.now()
         data = [
             ['Dron#','Dron Amount', 'Best Postion Global', 'Best Error Global', 'Iterations', 'Iteration', 'Size',
@@ -85,6 +86,7 @@ def run_pso(iterations, size, num_particles):
                         TERRAIN, BLACK, (col * PIXEL_WIDHT, fila * PIXEL_HEIGHT, PIXEL_WIDHT, PIXEL_HEIGHT))
 
     def percetange_explore(map):
+        """function to retrieve the explore percentage"""
         count = 0
         map_size = len(map[0])
         for i in range(map_size):
@@ -200,5 +202,4 @@ def run_pso(iterations, size, num_particles):
         if iteration > iterations:
             running = False
 
-
-# run_pso(num_particles=10, iterations=100, size=50)
+# run_pso(num_particles=25, iterations=500, size=50)

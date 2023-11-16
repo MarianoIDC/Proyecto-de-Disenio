@@ -17,9 +17,11 @@ def generate_blueprint(density, size):
         blueprint[0][i] = 1
         blueprint[size-1][i] = 1
     blueprint[size-1][size-1] = 0
+    # print(blueprint)
     return blueprint
 
 def empty_blueprint(size):
+    """function that creates an empty blueprint"""
     blueprint = np.zeros((size, size))
     for i in range(size):
         blueprint[i][0] = 1
@@ -27,3 +29,5 @@ def empty_blueprint(size):
         blueprint[0][i] = 1
         blueprint[size-1][i] = 1
     return blueprint
+
+# generate_blueprint(0.3, 50)
